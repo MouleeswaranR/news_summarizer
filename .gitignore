@@ -1,4 +1,6 @@
-__pycache__
+__pycache__/
+*.pyc
 .env
-audio_output
+audio_output/
 news_summaries.db
+.venv/
