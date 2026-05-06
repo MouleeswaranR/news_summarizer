@@ -1,0 +1,4 @@
+__pycache__
+.env
+audio_output
+news_summaries.db
