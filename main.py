@@ -1,7 +1,7 @@
 import argparse
 from graph import build_graph
 from database import init_db
-from config import VALID_CATEGORIES, VALID_REGIONS
+from config import VALID_CATEGORIES, VALID_REGIONS, INDIAN_STATES
 
 SENTIMENT_ICONS = {"positive": "+", "negative": "-", "neutral": "~"}
 
@@ -11,11 +11,14 @@ def run():
     parser = argparse.ArgumentParser(description="Autonomous News Summarizer Agent")
     parser.add_argument("--category", choices=VALID_CATEGORIES, default="general", help="News category")
     parser.add_argument("--region", choices=VALID_REGIONS, default="india", help="News region")
+    parser.add_argument("--state", type=str, default="Tamil Nadu", help="Indian state for filtering")
     parser.add_argument("--date", type=str, default="", help="Specific date (YYYY-MM-DD) to fetch news from")
     parser.add_argument("--no-voice", action="store_true", help="Skip voice summary generation")
     args = parser.parse_args()
 
     init_db()
+
+    state_filter = args.state if args.region == "india" else ""
 
     graph = build_graph()
     initial_state = {
@@ -23,6 +26,7 @@ def run():
         "category": args.category,
         "region": args.region,
         "date": args.date,
+        "state": state_filter,
         "raw_articles": [],
         "filtered_articles": [],
         "summaries": [],
@@ -30,8 +34,9 @@ def run():
         "error": None,
     }
 
+    state_info = f" ({args.state})" if state_filter else ""
     date_info = f" for date {args.date}" if args.date else ""
-    print(f"\nFetching {args.category} news for {args.region}{date_info}...\n")
+    print(f"\nFetching {args.category} news for {args.region}{state_info}{date_info}...\n")
     result = graph.invoke(initial_state)
 
     if result.get("error"):

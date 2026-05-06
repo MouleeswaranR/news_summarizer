@@ -27,3 +27,12 @@ VALID_CATEGORIES = [
 ]
 
 VALID_REGIONS = ["india", "global"]
+
+INDIAN_STATES = [
+    "Tamil Nadu", "Karnataka", "Kerala", "Andhra Pradesh", "Telangana",
+    "Maharashtra", "Gujarat", "Rajasthan", "Uttar Pradesh", "Madhya Pradesh",
+    "West Bengal", "Bihar", "Odisha", "Punjab", "Haryana",
+    "Jharkhand", "Chhattisgarh", "Assam", "Goa", "Himachal Pradesh",
+    "Uttarakhand", "Delhi", "Jammu and Kashmir", "Manipur", "Meghalaya",
+    "Mizoram", "Nagaland", "Sikkim", "Tripura", "Arunachal Pradesh",
+]

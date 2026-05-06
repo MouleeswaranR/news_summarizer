@@ -18,6 +18,7 @@ class AgentState(TypedDict):
     category: str
     region: str
     date: str
+    state: str
     raw_articles: list[dict]
     filtered_articles: list[dict]
     summaries: list[dict]
@@ -38,12 +39,13 @@ def fetch_node(state: AgentState) -> dict:
     category = state["category"]
     region = state["region"]
     date = state.get("date", "")
+    indian_state = state.get("state", "")
     articles = []
     errors = []
 
     print("  [Agent] Calling NewsAPI...")
     try:
-        result = fetch_newsapi.invoke({"category": category, "region": region, "date": date})
+        result = fetch_newsapi.invoke({"category": category, "region": region, "date": date, "state": indian_state})
         print(f"  [Agent] NewsAPI returned {len(result)} articles")
         articles.extend(result)
     except Exception as e:
@@ -52,7 +54,7 @@ def fetch_node(state: AgentState) -> dict:
 
     print("  [Agent] Calling GNews...")
     try:
-        result = fetch_gnews.invoke({"category": category, "region": region, "date": date})
+        result = fetch_gnews.invoke({"category": category, "region": region, "date": date, "state": indian_state})
         print(f"  [Agent] GNews returned {len(result)} articles")
         articles.extend(result)
     except Exception as e:

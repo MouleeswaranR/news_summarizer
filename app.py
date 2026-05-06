@@ -7,7 +7,7 @@ from database import init_db, query_summaries
 from tools import get_why_it_matters
 from cache_manager import load_cached_summaries, get_cache_age_hours, save_to_cache
 from scheduler import init_scheduler
-from config import VALID_CATEGORIES, VALID_REGIONS
+from config import VALID_CATEGORIES, VALID_REGIONS, INDIAN_STATES
 
 SENTIMENT_EMOJI = {"positive": "🟢", "negative": "🔴", "neutral": "🟡"}
 
@@ -23,6 +23,14 @@ with st.sidebar:
     st.header("Settings")
     category = st.selectbox("Category", VALID_CATEGORIES, index=0)
     region = st.selectbox("Region", VALID_REGIONS, index=0)
+
+    st.subheader("State Filter")
+    selected_state = ""
+    if region == "india":
+        use_state = st.checkbox("Filter by Indian State", value=True)
+        if use_state:
+            default_idx = INDIAN_STATES.index("Tamil Nadu")
+            selected_state = st.selectbox("Select State", INDIAN_STATES, index=default_idx)
 
     st.subheader("Date Filter")
     use_date = st.checkbox("Fetch news for a specific date")
@@ -70,6 +78,7 @@ if fetch_btn:
             "category": category,
             "region": region,
             "date": selected_date,
+            "state": selected_state,
             "raw_articles": [],
             "filtered_articles": [],
             "summaries": [],
@@ -95,6 +104,8 @@ if "summaries" in st.session_state and st.session_state["summaries"]:
     summaries = st.session_state["summaries"]
 
     title_text = f"Top {category.title()} News — {region.title()}"
+    if selected_state:
+        title_text += f" | {selected_state}"
     if selected_date:
         title_text += f" | Date: {selected_date}"
     st.subheader(title_text)

@@ -9,30 +9,39 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 @tool
-def fetch_newsapi(category: str, region: str, date: str = "") -> list[dict]:
-    """Fetch headlines from NewsAPI.org based on category, region, and date.
+def fetch_newsapi(category: str, region: str, date: str = "", state: str = "") -> list[dict]:
+    """Fetch headlines from NewsAPI.org based on category, region, date, and state.
 
     Args:
         category: News category (technology, sports, business, health, science, entertainment, general)
         region: Either 'india' or 'global'
         date: Specific date in YYYY-MM-DD format. If empty, fetches today's news.
+        state: Indian state name for state-wise filtering. If empty, no state filter.
     """
     country = "in" if region == "india" else "us"
 
-    if date:
+    if state or date:
         url = "https://newsapi.org/v2/everything"
-        q = category if category != "general" else "news"
+        q_parts = []
+        if state:
+            q_parts.append(f'"{state}"')
         if category == "politics":
-            q = "politics OR government OR election OR minister OR parliament"
+            q_parts.append("(politics OR government OR election OR minister)")
+        elif category != "general":
+            q_parts.append(category)
+        else:
+            q_parts.append("news")
+        q = " AND ".join(q_parts)
         params = {
             "apiKey": NEWS_API_KEY,
             "q": q,
-            "from": date,
-            "to": date,
             "language": "en",
-            "sortBy": "relevancy",
+            "sortBy": "publishedAt",
             "pageSize": 10,
         }
+        if date:
+            params["from"] = date
+            params["to"] = date
     elif category == "politics":
         url = "https://newsapi.org/v2/top-headlines"
         params = {
@@ -72,13 +81,14 @@ def fetch_newsapi(category: str, region: str, date: str = "") -> list[dict]:
 
 
 @tool
-def fetch_gnews(category: str, region: str, date: str = "") -> list[dict]:
-    """Fetch headlines from GNews.io based on category, region, and date.
+def fetch_gnews(category: str, region: str, date: str = "", state: str = "") -> list[dict]:
+    """Fetch headlines from GNews.io based on category, region, date, and state.
 
     Args:
         category: News category (technology, sports, business, health, science, entertainment, general)
         region: Either 'india' or 'global'
         date: Specific date in YYYY-MM-DD format. If empty, fetches today's news.
+        state: Indian state name for state-wise filtering. If empty, no state filter.
     """
     country = "in" if region == "india" else "us"
 
@@ -95,11 +105,18 @@ def fetch_gnews(category: str, region: str, date: str = "") -> list[dict]:
 
     gnews_category = GNEWS_CATEGORY_MAP.get(category, "general")
 
-    if category == "politics" or date:
+    if state or category == "politics" or date:
         url = "https://gnews.io/api/v4/search"
-        q = category if category != "general" else "news"
+        q_parts = []
+        if state:
+            q_parts.append(f'"{state}"')
         if category == "politics":
-            q = "politics OR government OR election OR minister"
+            q_parts.append("politics OR government OR election OR minister")
+        elif category != "general":
+            q_parts.append(category)
+        else:
+            q_parts.append("news")
+        q = " ".join(q_parts)
         params = {
             "apikey": GNEWS_API_KEY,
             "q": q,
